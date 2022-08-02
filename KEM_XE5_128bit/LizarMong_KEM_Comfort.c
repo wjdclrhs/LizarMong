@@ -28,10 +28,10 @@ int Keygen(unsigned char *pk, unsigned char *sk){
 	randombytes(seed_s, HS*4);
 
 	while (hw < HS) {
-		sk_random_idx = seed_s[count++]; 
-		sk_random_idx <<= 8;
-		sk_random_idx ^= seed_s[count++];
-		sk_random_idx &= (LWE_N - 1);
+		sk_random_idx = seed_s[count++];  // 16bit 중 randombytes에서 뽑은 8bit 저장
+		sk_random_idx <<= 8; // 저장된 8bit을 16bit 공간 중 상위 8bit로 이동
+		sk_random_idx ^= seed_s[count++]; // 다시 8bit와 xor하면 결국 16bit 정수가 만들어짐.
+		sk_random_idx &= (LWE_N - 1); // 모두 1인 9bit와 and하면 0~511사이의 랜덤한 인덱스가 만들어짐. 결국 위의 단계는 랜덤바이트가 8bit 랜덤을 뽑기 때문에 9bit 랜덤을 쓰기위한 단계임.
 		if (sk[sk_random_idx] == 0) {
 			sk[sk_random_idx] = (seed_s[count++] & 0x02) - 1;
 			hw++;
